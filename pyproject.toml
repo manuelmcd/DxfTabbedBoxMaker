@@ -43,7 +43,7 @@ path = "dxftabbedboxmaker/__about__.py"
 dependencies = [
   "pytest",
   "pytest-cov",
-  "tabbedboxmaker @ git+ssh://git@github.com/manuelmcd/TabbedBoxMaker",
+  "tabbedboxmaker @ git+https://github.com/manuelmcd/TabbedBoxMaker",
 ]
 [tool.hatch.envs.default.scripts]
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=dxftabbedboxmaker --cov=tests {args}"
