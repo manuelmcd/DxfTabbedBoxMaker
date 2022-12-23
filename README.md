@@ -3,12 +3,16 @@
 [![PyPI - Version](https://img.shields.io/pypi/v/dxftabbedboxmaker.svg)](https://pypi.org/project/dxftabbedboxmaker)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/dxftabbedboxmaker.svg)](https://pypi.org/project/dxftabbedboxmaker)
 
+Generate DXF outlines for finger-jointed boxes, to be cut by a laser cutter or
+CNC mill.
+
 -----
 
 **Table of Contents**
 
 - [Installation](#installation)
 - [License](#license)
+-
 
 ## Installation
 
