@@ -44,12 +44,13 @@ def effect(length: float, width: float, height: float, thickness: float, config:
     if min(X,Y,Z)==0:
       print('Error: Dimensions must be non zero')
       error=1
-    if min(X,Y,Z)<3*box.cfg.tab:
-      print('Error: Tab size too large')
-      error=1
-    if box.cfg.thickness is not None and box.cfg.tab<thickness:
-      print('Error: Tab size too small')
-      error=1
+    if box.cfg.tab is not None:
+        if min(X,Y,Z)<3*box.cfg.tab:
+            print('Error: Tab size too large')
+            error=1
+        if box.cfg.tab<thickness:
+            print('Error: Tab size too small')
+            error=1
     if thickness==0:
       print('Error: Thickness is zero')
       error=1
