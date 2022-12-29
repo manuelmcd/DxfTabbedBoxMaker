@@ -47,7 +47,7 @@ def effect(length: float, width: float, height: float, thickness: float, config:
     if min(X,Y,Z)<3*box.cfg.tab:
       print('Error: Tab size too large')
       error=1
-    if box.cfg.tab<thickness:
+    if box.cfg.thickness is not None and box.cfg.tab<thickness:
       print('Error: Tab size too small')
       error=1
     if thickness==0:
@@ -69,7 +69,7 @@ def effect(length: float, width: float, height: float, thickness: float, config:
     if error: exit()
 
     groups = box.make(X, Y, Z, thickness)
-    
+
     output_file = box.cfg.output
     if output_file == '-':
         output_file = sys.stdout
@@ -83,7 +83,7 @@ def effect(length: float, width: float, height: float, thickness: float, config:
 
 def main():
     ap = argparse.ArgumentParser()
-    tabbedboxmaker.add_args(ap)
+    tabbedboxmaker.TabbedBox.add_args(ap)
 
     ap.add_argument(
         '--output', type=str, default='-',
@@ -95,5 +95,5 @@ def main():
     ap.add_argument('thickness', type=float, help='Thickness of Material')
 
     args = ap.parse_args()
-    
+
     effect(args.length, args.width, args.height, args.thickness, args)
