@@ -1,6 +1,10 @@
+from typing import List
+
 import argparse
+import math
 import tabbedboxmaker
 import ezdxf.addons.r12writer
+import rpack
 import sys
 
 class DxfExporter(object):
@@ -71,6 +75,9 @@ def effect(length: float, width: float, height: float, thickness: float, config:
 
     groups = box.make(X, Y, Z, thickness)
 
+    if config.pack:
+        pack(groups)
+
     output_file = box.cfg.output
     if output_file == '-':
         output_file = sys.stdout
@@ -82,6 +89,41 @@ def effect(length: float, width: float, height: float, thickness: float, config:
             for path in group:
                 dxf_exporter.export(path, dxf_file)
 
+def pack(lpl: List[List[tabbedboxmaker.Path]]):
+    boundingboxes = []
+    sizes = []
+    bbpaths = []
+    for pathlist in lpl:
+        bb = pathlist[0].boundingbox()
+        for path in pathlist:
+            sbb = path.boundingbox()
+            bb = (
+                (min(sbb[0][0], bb[0][0]), min(sbb[0][1], bb[0][1])),
+                (max(sbb[1][0], bb[1][0]), max(sbb[1][1], bb[1][1])),
+            )
+
+        width = int(math.ceil(bb[1][0] - bb[0][0]))
+        height = int(math.ceil(bb[1][1] - bb[0][1]))
+        boundingboxes.append(bb)
+        sizes.append((width, height))
+        bbp = tabbedboxmaker.Path(bb[0][0], bb[0][1]) # minx, miny
+        bbp.add(tabbedboxmaker.LineSegment(bb[0][0], bb[1][1])) # minx, maxy
+        bbp.add(tabbedboxmaker.LineSegment(bb[1][0], bb[1][1])) # maxx, maxy
+        bbp.add(tabbedboxmaker.LineSegment(bb[1][0], bb[0][1])) # maxx, miny
+        bbp.add(tabbedboxmaker.LineSegment(bb[0][0], bb[0][1])) # minx, miny
+        bbpaths.append(bbp)
+    #print(f"Adding boundingbox paths: {bbpaths}")
+    #lpl.append(bbpaths)
+    positions = rpack.pack(sizes)
+    if len(positions) != len(boundingboxes) or len(positions) != len(lpl):
+        raise Exception(f"Length mismatch {len(positions)}, {len(boundingboxes)}, {len(lpl)}")
+
+    for i, pathlist in enumerate(lpl):
+        dx = positions[i][0]-boundingboxes[i][0][0]
+        dy = positions[i][1]-boundingboxes[i][0][1]
+        for path in pathlist:
+            path.translate(dx, dy)
+
 def main():
     ap = argparse.ArgumentParser()
     tabbedboxmaker.TabbedBox.add_args(ap)
@@ -89,6 +131,9 @@ def main():
     ap.add_argument(
         '--output', type=str, default='-',
         help="Output DXF filename (default '-' for STDOUT)"
+    )
+    ap.add_argument(
+        '--pack', action='store_true', help='Pack shapes'
     )
     ap.add_argument('length',type=float, help='Length of Box')
     ap.add_argument('width', type=float, help='Width of Box')

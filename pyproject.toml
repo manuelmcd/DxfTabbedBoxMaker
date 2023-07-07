@@ -25,6 +25,7 @@ classifiers = [
 ]
 dependencies = [
   "ezdxf",
+  "rectangle-packer",
 ]
 dynamic = ["version"]
 
